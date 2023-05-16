@@ -335,7 +335,7 @@ manual_install() {
                 elif [[ $selection == "Menu" ]]; then
                     clear
                     menu
-                    fi
+                 fi
             done
             break
         else
