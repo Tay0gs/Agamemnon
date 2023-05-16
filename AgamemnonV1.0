@@ -238,7 +238,7 @@ manual_install() {
     clear
     echo "You chose manual installation"
     # Define an array of software options
-    software=(“Aircrack” “BeEf” “Bloodhound” “Hashcat” “John the Ripper” “Metasploit Framework” “Mimikatz” “Nessus” “Netcat” “Nikto” “Nmap” “Ophcrack” “OpenVas” “Photon” “Postman” “Powershell” “Recon-ng” “SET Toolkit” “Sherlock” “Shodan” “SQLMap” “Websploit” “Wireshark”)
+    software=("Aircrack" "BeEf" "Bloodhound" "Hashcat" "John the Ripper" "Metasploit Framework" "Mimikatz" "Nessus" "Netcat" "Nikto" "Nmap" "Ophcrack" "OpenVas" "Photon" "Postman" "Powershell" "Recon-ng" "SET Toolkit" "Sherlock" "Shodan" "SQLMap" "Websploit" "Wireshark" "Menu")
     # Define an array to hold the user's selections
     selections=()
     while true; do
@@ -332,6 +332,9 @@ manual_install() {
                     cd set
                     pip install -r requirements.txt
                     cd ..
+                 elif [[ $selection == "Menu" ]]; then
+                    clear
+                    menu
                  fi
             done
             break
