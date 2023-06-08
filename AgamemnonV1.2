@@ -1,0 +1,572 @@
+#!/bin/bash
+First_Time() {
+    choice=()
+    echo "Is this the first time running this?"
+    read -p "Y/N: " choice
+    clear
+    if [[ $choice =~ "Y" ]]; then
+        sudo mkdir ~/Agamemnon/ 
+        #Making the Agamemnon directory
+        clear
+        sudo chmod -R 777 ~/Agamemnon/ #Giving the user full permissions to the directory and any subdirectories 
+        #Gathering pre-requisites for Agamemnon to run
+        echo "Making the directory needed for installation"
+        echo "I will perform a system update to ensure that everything runs as smoothly as anticipated"
+        sudo apt-get update
+        sudo apt-add-repository -y ppa:brightbox/ruby-ng
+        sudo apt-add-repository -y universe
+        gem install bundler
+        sudo apt-get update
+        clear
+        echo "Installing Packages. This may take a few minutes..."
+        #Installing Packages Silently
+        sudo apt-get -y -qq install \
+            ca-certificates \
+            curl \
+            gnupg \
+            git \
+            npm \
+            python3 \
+            python3-pip \
+            snapd \
+            docker.io \
+            2to3 python-is-python3 \
+            qtcreator \
+            qtbase5-dev \
+            qt5-qmake \
+            cmake
+        clear
+        sudo npm install --global yarn
+        #Deleting unused packages with the autoclean function
+        sudo apt autoclean
+        clear
+        echo "Pre-requisites accquired"
+        echo "Thank you for using Agamemnon"
+        echo ""
+    elif [[ $choice =~ "N" ]]; then
+        menu
+    else
+        First_Time
+    fi
+}
+menu(){
+    while true; do
+        #Display Main Menu
+        clear
+        echo "Please choose an option:"
+        echo "1. I'm not sure where to start (Toolset Download / Assisted Installation)"
+        echo "2. I know what I'd like (manual installation)"
+        echo "3. I'm going for a certification (Install Certification Set)"
+        echo "4. I'd like to update installed software"
+        echo "5. Exit (Close the application)"
+        read -p "Enter your choice: " choice
+        clear
+        case $choice in
+        #Menu selection & confirmation
+            1) Toolset_Installation;;
+            2) manual_install;;
+            3) certification_set;;
+            4) sudo apt-get update && clear && echo "Update completed!" && echo"";;
+            5) break && exit;;
+            *) echo "Invalid option";;
+        esac
+    done
+}
+Toolset_Installation() {
+    clear
+    echo "You chose the toolset installation option"
+    categories=("Recon" "Password Cracking" "Networking" "Social Engineering" "Web Application Pentesting" "Menu")
+    # Display the software options
+    echo "Please choose the software you'd like to install:"
+    for i in "${!categories[@]}"; do
+        echo "$((i+1)). ${categories[$i]}"
+    done
+    read -p "Enter your choice: " choice
+    if (( choice >= 1 && choice <= ${#categories[@]} )); then
+    #Read the number submitted, if the number is larger submitted is larger than the number of items listed, count it as confirmation
+        selection="${categories[$((choice-1))]}"
+        if [[ $selection == "Recon" ]]; then
+        #Installing "Recon" toolset
+            clear
+            echo "You've selected $selection, would you like to confirm this?"
+            read -p "Input Y to confirm: " confirmation
+            if [[ $confirmation = "Y" ]]; then 
+                sudo mkdir ~/Agamemnon/Recon
+                sudo chmod -R 777 ~/Agamemnon/Recon
+                cd ~/Agamemnon/Recon
+                sudo git clone https://github.com/lanmaster53/recon-ng.git
+                cd recon-ng
+                pip install -r REQUIREMENTS
+                cd ..
+                echo -e "Recon-ng guidance https://hackertarget.com/recon-ng-tutorial/ \n" >> Reconhelp.txt
+                pip install shodan
+                echo -e "Shodan guidance https://cli.shodan.io/" \n >> Reconhelp.txt
+                pip install censys
+                echo -e "Censys guidance https://pypi.org/project/censys/ \n" >> Reconhelp.txt
+                sudo apt-get install -y wireshark
+                echo -e "Wireshark guidance https://opensource.com/article/20/1/wireshark-linux-tshark \n" >> Reconhelp.txt
+                git clone https://github.com/s0md3v/Photon.git
+                echo -e "Photon guidance https://github.com/s0md3v/Photon.git \n" >> Reconhelp.txt
+                git clone https://github.com/leebaird/discover
+                echo -e "Discover guidance https://github.com/leebaird/discover \n" >> Reconhelp.txt
+                git clone https://github.com/DataSploit/datasploit
+                echo -e "Datasploit guidance https://github.com/DataSploit/datasploit \n" >> Reconhelp.txt
+                sudo apt autoclean
+                clear
+                #Adding the names of software installed to an external file
+                echo "Recon Apps installed: Sherlock, Recon-ng, Shodan, Censys, Wireshark, Photon, Discover, Datasploit" >> ~/Agamemnon/Agamemnon_Installed_Apps
+                echo ""
+                echo "The Recon tools have been installed"
+                echo ""
+                read -p "Press enter to continue:"
+                menu
+            else
+                Assisted_Installation
+            fi
+        elif [[ $selection == "Password Cracking" ]]; then
+                clear
+                echo "You've selected $selection, would you like to confirm this?"
+                read -p "Input Y to confirm: " confirmation
+                if [[ $confirmation = "Y" ]]; then 
+                #Installing "Password Cracking" toolset
+                clear
+                mkdir ~/Agamemnon/Cracking
+                sudo chmod -R 777 ~/Agamemnon/Cracking
+                cd ~/Agamemnon/Cracking
+                sudo apt-get install -y john \
+                                    hashcat
+                echo -e "John guidance https://github.com/openwall/john \n" >> Cracking.txt
+                echo -e "Hashcat guidance https://hashcat.net/wiki/ \n" >> Cracking.txt
+                sudo apt autoclean
+                clear
+                #Adding the names of software installed to an external file
+                echo "Password Cracking Apps installed: John the Ripper, Hashcat" >> ~/Agamemnon/Agamemnon_Installed_Apps
+                echo "The Password Cracking tools have been installed"
+                read -p "Press enter to continue:"
+            else
+                Assisted_Installation
+            fi
+        elif [[ $selection == "Networking" ]]; then
+            echo "You've selected $selection, would you like to confirm this?"
+            read -p "Input Y to confirm: " confirmation
+            if [[ $confirmation = "Y" ]]; then 
+            #Installing "Networking" toolset
+            mkdir ~/Agamemnon/Networking
+            sudo chmod -R 777 ~/Agamemnon/Networking
+            cd ~/Agamemnon/Networking
+            pip install -U --user shodan
+            curl --request GET \
+            --url 'https://www.tenable.com/downloads/api/v2/pages/nessus/files/Nessus-10.5.1-debian10_amd64.deb' \
+            --output 'Nessus-10.5.1-debian10_amd64.deb'
+            sudo dpkg -i Nessus-*
+            sudo add-apt-repository universe
+            sudo apt update
+            echo -e "Nessus guidance https://linux.how2shout.com/how-to-install-nessus-scanner-on-debian-11-or-10/ \n" >> Networking_help.txt
+            sudo apt-get install -y openvas \
+                                nmap \
+                                netcat \
+                                hydra-gtk
+            echo -e "Openvas guidance https://ethicalhackingguru.com/openvas-tutorial-how-to-use-openvas/ \n" >> Networking_help.txt
+            echo -e "Nmap guidance https://www.varonis.com/blog/nmap-commands \n" >> Networking_help.txt
+            echo -e "Netcat guidance https://www.varonis.com/blog/netcat-commands \n" >> Networking_help.txt
+            sudo apt-get install -y wireshark
+            echo -e "Wireshark guidance https://opensource.com/article/20/1/wireshark-linux-tshark \n" >> Networking_help.txt
+            sudo apt autoclean
+            clear
+            #Adding the names of software installed to an external file
+            echo "Networking Apps installed: Shodan, Nessus, Openvas, Nmap, Netcat, Hydra" >> ~/Agamemnon/Agamemnon_Installed_Apps
+            echo "The Networking tools have been installed"
+            read -p "Press enter to continue:"
+            menu
+            else
+                Assisted_Installation
+            fi
+        elif [[ $selection == "Social Engineering" ]]; then
+            echo "You've selected $selection, would you like to confirm this?"
+            read -p "Input Y to confirm: " confirmation
+            if [[ $confirmation = "Y" ]]; then 
+            #Adding the names of software installed to an external file
+            mkdir ~/Agamemnon/SocialEng
+            sudo chmod -R 777 ~/Agamemnon/SocialEng
+            cd ~/Agamemnon/SocialEng
+            wget https://github.com/trustedsec/social-engineer-toolkit/raw/master/readme/User_Manual.pdf
+            git clone https://github.com/trustedsec/social-engineer-toolkit/ set/
+            cd set
+            pip install -r requirements.txt
+            cd ..
+            git clone https://github.com/wifiphisher/wifiphisher.git 
+            echo -e "WifiPhisher Guidance https://github.com/wifiphisher/wifiphisher.git \n" >> Social_Engineering.txt
+            cd wifiphisher 
+            sudo python setup.py install 
+            sudo apt autoclean
+            clear
+            #Adding the names of software installed to an external file
+            echo "Social Engineering Apps installed: SET Toolkit, WifiPhisher" >> ~/Agamemnon/Agamemnon_Installed_Apps
+            echo "The Social Engineering tools have been installed"
+            read -p "Press enter to continue:"
+            menu
+            else
+                Assisted_Installation
+            fi
+        elif [[ $selection == "Web Application Pentesting" ]]; then
+            echo "You've selected $selection, would you like to confirm this?"
+            read -p "Input Y to confirm: " confirmation
+            if [[ $confirmation = "Y" ]]; then 
+                mkdir ~/Agamemnon/Web_Application
+                sudo chmod -R 777 ~/Agamemnon/Web_Application
+                cd ~/Agamemnon/Web_Application
+                sudo snap install zaproxy --classic
+                sudo apt-get install -y nmap \
+                                    nikto \
+                                    websploit    
+                echo -e "Nmap guidance https://www.varonis.com/blog/nmap-commands \n" >> Web_Application.txt
+                echo -e "Nikto guidance https://github.com/sullo/nikto \n" >> Web_Application.txt
+                echo -e "WebSploit guidance https://salsa.debian.org/pkg-security-team/websploit \n" >> Web_Application.txt
+                sudo apt autoclean
+                clear
+                #Adding the names of software installed to an external file
+                echo "Web Application Testing Apps installed: Nmap Nikto, Websploit" >> ~/Agamemnon/Agamemnon_Installed_Apps
+                echo "The Web Application Pentesting tools have been installed"
+                read -p "Press enter to continue:"
+                menu
+            else
+                Assisted_Installation
+            fi
+        fi
+        elif [[ $selection == "Menu" ]]; then
+                    clear
+                    menu
+            
+    else
+        echo "Invalid option"
+    fi
+}
+manual_install() {
+    clear
+    echo "You chose manual installation"
+    # Define an array of software options
+    software=("Aircrack" "BeEf" "Bloodhound" "Hashcat" "John the Ripper" "Metasploit Framework" "Mimikatz" "Nessus" "Netcat" "Nikto" "Nmap" "Ophcrack" "OpenVas" "Photon" "Postman" "Powershell" "Recon-ng" "SET Toolkit" "Sherlock" "Shodan" "SQLMap" "Websploit" "Wireshark" "Menu")
+    # Define an array to hold the user's selections
+    selections=()
+    while true; do
+        # Display the software options
+        echo "Please choose the software you'd like to install:"
+        for i in "${!software[@]}"; do
+            echo "$((i+1)). ${software[$i]}"
+        done
+        echo "$(( ${#software[@]} + 1 )). Confirm selection and install"
+        read -p "Enter your choice: " choice
+        if (( choice >= 1 && choice <= ${#software[@]} )); then
+            # Add the selected software to the selections array
+            selections+=("${software[$((choice-1))]}")
+            echo "Added ${software[$((choice-1))]} to the installation list"
+        elif (( choice == ${#software[@]} + 1 )); then
+            # Confirm selection and install
+            echo "You have selected the following software for installation:"
+            printf '%s\n' "${selections[@]}"
+            # Install the selected software
+            for selection in "${selections[@]}"; do
+                if [[ $selection == "Nmap" ]]; then
+                    sudo apt-get install nmap -y
+                elif [[ $selection == "Wireshark" ]]; then
+                    sudo apt-get install wireshark -y
+                elif [[ $selection == "Metasploit Framework" ]]; then
+                    sudo apt-get install metasploit-framework -y
+                elif [[ $selection == "John the Ripper" ]]; then
+                    wget http://www.openwall.com/john/j/john-1.9.0-jumbo-1.tar.gz
+                    tar xfz john-1.9.0-jumbo-1.tar.gz
+                    cd john-1.9.0-jumbo-1/src/
+                    ./configure && make -s clean && make -sj4 
+                elif [[ $selection == "Aircrack" ]]; then
+                    sudo apt-get -y install aircrack.ng
+                elif [[ $selection == "Recon-ng" ]]; then
+                    sudo apt-get install -y recon-ng
+                elif [[ $selection == "SQLMap" ]]; then
+                    sudo apt-get -y install sqlmap
+                elif [[ $selection == "Metasploit" ]]; then
+                    curl https://raw.githubusercontent.com/rapid7/metasploit-omnibus/master/config/templates/metasploit-framework-wrappers/msfupdate.erb > msfinstall
+                    chmod +x msfinstall
+                    sudo chmod +x ./metasploit-latest-linux-x64-installer.run
+                    sudo apt autoclean
+                    clear
+                    ./msfinstall
+                elif [[ $selection == "BeEf" ]]; then
+                    git clone https://github.com/beefproject/beef
+                    cd beef
+                    sudo ./install
+                elif [[ $selection == "Hashcat" ]]; then
+                    sudo apt-get install -y hashcat
+                elif [[ $selection == "Shodan" ]]; then
+                    sudo pip install -U --user shodan
+                elif [[ $selection == "Nikto" ]]; then
+                    sudo apt-get install -y nikto
+                elif [[ $selection == "BeEf" ]]; then
+                    git clone https://github.com/beefproject/beef
+                    cd beef
+                    sudo ./install       
+                elif [[ $selection == "Photon" ]]; then
+                    git clone https://github.com/s0md3v/Photon.git
+                elif [[ $selection == "Aircrack" ]]; then
+                    sudo apt-get -y install aircrack.ng
+                elif [[ $selection == "Netcat" ]]; then
+                    sudo apt-get -y install netcat
+                elif [[ $selection == "Postman" ]]; then
+                    wget "https://dl.pstmn.io/download/latest/linux_64"
+                    tar -xzf Postman-linux-x64-*.tar.gz
+                    sudo mv Postman /opt/
+                    sudo ln -s /opt/Postman/Postman /usr/bin/postman
+                elif [[ $selection == "Mimikatz" ]]; then
+                    sudo apt-get install -y mimikatz
+                elif [[ $selection == "Bloodhound" ]]; then
+                    sudo npm install -g electron-packager
+                    sudo git clone https://github.com/BloodHoundAD/BloodHound
+                    sudo npm install
+                elif [[ $selection == "Ophcrack" ]]; then
+                    sudo apt-get install -y ophcrack
+                elif [[ $selection == "Nessus" ]]; then
+                curl --request GET \
+                    --url 'https://www.tenable.com/downloads/api/v2/pages/nessus/files/Nessus-10.5.1-debian10_amd64.deb' \
+                    --output 'Nessus-10.5.1-debian10_amd64.deb'
+                    sudo dpkg -i Nessus-*
+                elif [[ $selection == "Powershell" ]]; then
+                    sudo apt update && sudo apt install -y powershell
+                elif [[ $selection == "Websploit" ]]; then
+                    sudo apt-get install -y websploit
+                elif [[ $selection == "SET Toolkit" ]]; then
+                    git clone https://github.com/trustedsec/social-engineer-toolkit/ set/
+                    cd set
+                    pip install -r requirements.txt
+                    cd ..
+                 elif [[ $selection == "Menu" ]]; then
+                    clear
+                    menu
+                 fi
+            done
+            break
+        else
+            echo "Invalid option"
+        fi
+    done
+}
+certification_set() {
+    clear
+    echo "You chose the toolset installation option"
+    categories=("CEH" "Comptia Pentest+" "OSCP")
+    # Display the software options
+    echo "Please choose the software you'd like to install:"
+    for i in "${!categories[@]}"; do
+        echo "$((i+1)). ${categories[$i]}"
+    done
+    read -p "Enter your choice: " choice
+    if (( choice >= 1 && choice <= ${#categories[@]} )); then
+    #Read the number submitted, if the number is larger submitted is larger than the number of items listed, count it as confirmation
+        selection="${categories[$((choice-1))]}"
+        if [[ $selection == "CEH" ]]; then
+            echo "You've selected $selection, would you like to confirm this?"
+            read -p "Input Y to confirm: " confirmation
+            if [[ $confirmation = "Y" ]]; then 
+                clear
+                CEH
+            else
+                certification_set
+            fi
+        elif [[ $selection == "OSCP" ]]; then
+            echo "You've selected $selection, would you like to confirm this?"
+            read -p "Input Y to confirm: " confirmation
+            if [[ $confirmation = "Y" ]]; then 
+                clear
+                OSCP
+            else
+                certification_set
+            fi
+        elif [[ $selection == "Comptia Pentest+" ]]; then
+            echo "You've selected $selection, would you like to confirm this?"
+            read -p "Input Y to confirm: " confirmation
+            if [[ $confirmation = "Y" ]]; then 
+                Pentest_Plus
+            else
+                clear
+                certification_set
+            fi
+        elif [[ $selection == "Menu" ]]; then
+            echo "You've selected $selection, would you like to confirm this?"
+            read -p "Input Y to confirm: " confirmation
+            if [[ $confirmation = "Y" ]]; then 
+                menu
+            else
+                certification_set
+            fi
+        fi
+    else
+        echo "Invalid option"
+    fi
+}
+    Pentest_Plus() {
+        #Starting the Comptia Pentest+ Installation
+        mkdir ~/Agamemnon/Pentest_Plus
+        sudo chmod -R 777 ~/Agamemnon/Pentest_Plus
+        cd ~/Agamemnon/Pentest_Plus
+        echo "You've chosen pentest+"
+        echo "Installing now..."
+        sudo pip install -U --user shodan
+        sudo git clone https://github.com/lanmaster53/recon-ng.git
+        cd recon-ng
+        pip install -r REQUIREMENTS
+        cd ..
+        echo"Installing: "
+        sudo apt-get -y install nmap
+        curl https://raw.githubusercontent.com/rapid7/metasploit-omnibus/master/config/templates/metasploit-framework-wrappers/msfupdate.erb > msfinstall
+        chmod +x msfinstall
+        sudo chmod +x ./metasploit-latest-linux-x64-installer.run
+        sudo apt autoclean
+        clear
+        ./msfinstall
+        sudo apt-get update
+        echo"Installing: Netcat"
+        sudo apt-get -y install netcat
+        echo"Installing: Aircrack"
+        sudo apt-get -y install aircrack.ng
+        echo"Installing: Java Environment"
+        sudo apt-get -y install default-jdk
+        sudo snap install zaproxy --classic
+        wget "https://portswigger-cdn.net/burp/releases/download?product=community&version=2023.4.1&type=Linux"
+        sudo ./download\?product\=community\&version\=2023.4.1\&type\=Linux
+        sudo apt-get update
+        echo"Installing: SQLMap"
+        sudo apt-get -y install sqlmap
+        sudo docker pull fsecurelabs/drozer
+        cd ~/Agamemnon/Pentest_Plus
+        sudo git clone https://github.com/mwrlabs/needle.git
+        sudo apt-get -y install python2.7 python2.7-dev sshpass sqlite3 lib32ncurses5-dev
+        sudo pip install readline paramiko sshtunnel frida mitmproxy biplist
+        sudo docker pull opensecurity/mobile-security-framework-mobsf:latest
+        wget "https://dl.pstmn.io/download/latest/linux_64"
+        tar -xzf Postman-linux-x64-*.tar.gz
+        sudo mv Postman /opt/
+        sudo ln -s /opt/Postman/Postman /usr/bin/postman
+        sudo apt-get -y install ettercap-common
+        pip install frida-tools
+        sudo apt-get update
+        sudo apt-get clean
+        pip3 install objection
+        sudo apt-get install -y android-sdk
+        cd ~/Agamemnon/Pentest_Plus
+        sudo git clone https://github.com/muellerberndt/apkx
+        cd apkx
+        sudo ./install.sh
+        cd ~/Agamemnon/Pentest_Plus
+        sudo add-apt-repository ppa:beineri/opt-qt-5.12.3-xenial
+        sudo apt-get update
+        sudo apt install libgl1-mesa-dev qt512base
+        source /opt/qt512/bin/qt512-env.sh
+        sudo git clone https://github.com/vaibhavpandeyvpz/apkstudio.git
+        mkdir build && cd build
+        make apkstudio.pro CONFIG+=release ../apkstudio
+        git clone https://github.com/beefproject/beef
+        cd beef
+        sudo ./install
+        cd /opt
+        sudo git clone https://github.com/BC-SECURITY/Empire.git
+        cd Empire
+        sudo ./setup/install.sh
+        cd ~/Agamemnon/Pentest_Plus
+        sudo apt-get install mimikatz
+        sudo npm install -g electron-packager
+        sudo git clone https://github.com/BloodHoundAD/BloodHound
+        sudo npm install    
+        sudo apt autoclean
+        clear
+        echo "You have now installed the tools for PenTest+"
+        echo "The PenTest+ Exam objectives can be found here: https://partners.comptia.org/docs/default-source/resources/comptia-pentest-pt0-002-exam-objectives-(4-0)" >> Exam_Objectives.txt
+        read -p "Press enter to continue:"
+        menu
+    }
+    OSCP() {
+        echo "You've selected OSCP"
+        sudo mkdir ~/Agamemnon/OSCP
+        sudo chmod -R 777 ~/Agamemnon/OSCP
+        cd ~/Agamemnon/
+        sudo apt-get install -y dotnet-sdk-6.0
+        sudo npm install -g electron-packager
+        sudo git clone https://github.com/BloodHoundAD/BloodHound
+        sudo npm install
+        git clone https://github.com/BloodHoundAD/SharpHound
+        git clone https://github.com/EmpireProject/Empire
+        cd Empire
+        sudo ./setup/install.sh
+        cd ..
+        git clone --recurse-submodules https://github.com/cobbr/Covenant
+        cd Covenant/Covenant
+        docker build -t covenant .
+        echo "For more information, please consult https://github.com/cobbr/Covenant/wiki/Installation-And-Startup"
+        git clone https://github.com/PowerShellMafia/PowerSploit/blob/master/Recon/PowerView.ps1
+        git clone https://github.com/GhostPack/Rubeus
+        sudo gem install evil-winrm
+        git clone https://github.com/lgandx/Responder
+        git clone https://github.com/Porchetta-Industries/CrackMapExec
+        cd CrackMapExec/
+        sudo apt install python3.10-venv
+        python3 -m pip install pipx
+        sudo pipx install .
+        git clone https://github.com/clymb3r/PowerShell/blob/master/Invoke-Mimikatz/Invoke-Mimikatz.ps1
+        python3 -m pipx install impacket
+        git clone https://github.com/itm4n/PrintSpoofer
+        clear
+        echo "Some tools permitted within OSCP may work best within windows. Please refer to the code for and look at the tools to see which tools run best on windows."
+        echo "An official OSCP exam guide can be found here: https://help.offsec.com/hc/en-us/articles/360040165632-OSCP-Exam-Guide" >> OSCP_Exam_Guide.txt
+        echo "You have now installed the tools for OSCP"
+        read -p "Press enter to continue:"
+        menu
+    }
+    CEH() {
+        echo"You've Selected CEH"
+        #Installing the CEH toolset
+        sudo apt-get update
+        sudo mkdir ~/Agamemnon/CEH
+        sudo chmod -R 777 ~/Agamemnon/CEH
+        cd ~/Agamemnon/CEH
+        wget https://github.com/angryip/ipscan/releases/download/3.9.1/ipscan_3.9.1_amd64.deb
+        sudo dpkg -i ipscan*
+        sudo apt-get install -y recon-ng \
+                                nmap \
+                                nikto \
+                                aircrack.ng \
+                                ophcrack \
+                                hashcat \
+                                rkhunter \
+                                netcat
+        curl https://raw.githubusercontent.com/rapid7/metasploit-omnibus/master/config/templates/metasploit-framework-wrappers/msfupdate.erb > msfinstall
+        chmod +x msfinstall
+        sudo chmod +x ./metasploit-latest-linux-x64-installer.run
+        sudo apt autoclean
+        clear
+        ./msfinstall
+        curl --request GET \
+        --url 'https://www.tenable.com/downloads/api/v2/pages/nessus/files/Nessus-10.5.1-debian10_amd64.deb' \
+        --output 'Nessus-10.5.1-debian10_amd64.deb'
+        sudo dpkg -i Nessus-*
+        git clone https://github.com/nettitude/PoshC2
+        cd PoshC2
+        sudo ./Install.sh
+        sudo apt update  && sudo apt install -y curl gnupg apt-transport-https
+        curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+        sudo sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-debian-bullseye-prod bullseye main" > /etc/apt/sources.list.d/microsoft.list'
+        sudo apt update && sudo apt install -y powershell
+        wget "https://portswigger-cdn.net/burp/releases/download?product=community&version=2023.4.1&type=Linux"
+        sudo ./download\?product\=community\&version\=2023.4.1\&type\=Linux
+        sudo apt-get install -y wireshark
+        git clone https://github.com/vanhauser-thc/thc-hydra.git
+        cd thc-hydra
+        sudo ./configure
+        sudo make
+        sudo make install
+        sudo apt autoclean
+        clear
+        echo "You have now installed the tools for CEH"
+        echo "The CEH exam blueprint can be found here: https://cert.eccouncil.org/images/doc/CEH-Exam-Blueprint-v3.0.pdf" >> Exam_Objectives.txt
+        read -p "Press enter to continue:"
+        menu
+    }
+#Running the functions to start Agamemnon
+First_Time
+menu
